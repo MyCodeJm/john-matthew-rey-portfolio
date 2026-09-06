@@ -1,0 +1,14 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Netlify local dev
+.netlify/
+
+# Just in case any future tooling gets added
+node_modules/
+.env

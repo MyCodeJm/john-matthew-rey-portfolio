@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitQuest — Level Up Your Workouts</title>
+<style>
+  :root{
+    --bg:#11131A;
+    --panel:#181B26;
+    --panel-hi:#20263A;
+    --line:#2B3350;
+    --text:#E7E9F5;
+    --muted:#8A90B3;
+    --xp-a:#7C5CFC;
+    --xp-b:#28D9C7;
+    --gold:#FFC24B;
+    --danger:#FF5C7A;
+    --sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    --radius:14px;
+  }
+  *{ box-sizing:border-box; }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(124,92,252,0.14), transparent 45%),
+      radial-gradient(circle at 85% 20%, rgba(40,217,199,0.10), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    min-height:100vh;
+  }
+  a{ color:inherit; }
+  .wrap{ max-width:920px; margin:0 auto; padding:28px clamp(16px,4vw,40px) 80px; }
+
+  .top-link{ display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none; font-size:0.85rem; margin-bottom:22px; }
+  .top-link:hover{ color:var(--text); }
+
+  h1{ margin:0; font-size:1.5rem; }
+
+  .hud{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px clamp(18px,3vw,28px);
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    gap:20px;
+    align-items:center;
+    margin-bottom:28px;
+  }
+  @media (max-width:640px){ .hud{ grid-template-columns:1fr; text-align:center; } }
+
+  .level-badge{
+    width:76px; height:76px; border-radius:50%;
+    background:conic-gradient(var(--xp-a), var(--xp-b), var(--xp-a));
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; margin:0 auto;
+  }
+  .level-badge-inner{
+    width:64px; height:64px; border-radius:50%; background:var(--panel);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .level-badge-inner .lv-num{ font-family:var(--mono); font-weight:700; font-size:1.3rem; line-height:1; }
+  .level-badge-inner .lv-label{ font-size:0.55rem; letter-spacing:0.08em; color:var(--muted); text-transform:uppercase; }
+
+  .hud-mid{ min-width:0; }
+  .player-name-row{ display:flex; align-items:center; gap:10px; margin-bottom:4px; flex-wrap:wrap; justify-content:flex-start;}
+  @media (max-width:640px){ .player-name-row{ justify-content:center; } }
+  #playerName{
+    background:none; border:none; color:var(--text); font-size:1.1rem; font-weight:700;
+    font-family:var(--sans); padding:2px 4px; border-radius:4px; max-width:220px;
+  }
+  #playerName:focus{ outline:1px dashed var(--xp-b); }
+  .rank-tag{
+    font-family:var(--mono); font-size:0.7rem; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--gold); background:rgba(255,194,75,0.1); border:1px solid rgba(255,194,75,0.3);
+    padding:3px 9px; border-radius:999px;
+  }
+  .xp-track{ height:10px; border-radius:999px; background:var(--panel-hi); overflow:hidden; margin:10px 0 6px; }
+  .xp-fill{ height:100%; background:linear-gradient(90deg,var(--xp-a),var(--xp-b)); border-radius:999px; transition:width .5s ease; }
+  .xp-caption{ font-family:var(--mono); font-size:0.76rem; color:var(--muted); }
+
+  .streak-box{ text-align:center; flex-shrink:0; }
+  .streak-num{ font-family:var(--mono); font-size:1.6rem; font-weight:700; color:var(--gold); line-height:1; }
+  .streak-label{ font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-top:4px; }
+
+  .filters{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  .chip{
+    font-family:var(--mono); font-size:0.78rem; background:none; border:1px solid var(--line);
+    color:var(--muted); padding:7px 14px; border-radius:999px; cursor:pointer; transition:all .2s ease;
+  }
+  .chip:hover{ border-color:var(--xp-b); color:var(--xp-b); }
+  .chip.active{ background:var(--xp-b); border-color:var(--xp-b); color:#0A1420; font-weight:700; }
+
+  .quest-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; margin-bottom:30px; }
+  .quest-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px;
+    display:flex; flex-direction:column; gap:10px; transition:border-color .2s ease;
+  }
+  .quest-card.done{ border-color:rgba(40,217,199,0.4); background:var(--panel-hi); }
+  .quest-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .quest-name{ font-weight:700; font-size:0.98rem; }
+  .quest-cat{
+    font-family:var(--mono); font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em;
+    color:var(--muted); border:1px solid var(--line); padding:2px 7px; border-radius:5px; white-space:nowrap;
+  }
+  .quest-xp{ font-family:var(--mono); font-size:0.8rem; color:var(--gold); }
+  .quest-btn{
+    margin-top:auto; border:none; border-radius:8px; padding:9px 14px; font-weight:700; font-size:0.85rem;
+    cursor:pointer; font-family:var(--sans); transition:transform .12s ease, background .2s ease;
+  }
+  .quest-btn:hover{ transform:translateY(-1px); }
+  .quest-btn.todo{ background:var(--xp-b); color:#08201d; }
+  .quest-btn.todo:hover{ background:#4de3d3; }
+  .quest-btn.done-btn{ background:none; border:1px solid rgba(40,217,199,0.4); color:var(--xp-b); cursor:default; }
+  .quest-btn.done-btn:hover{ transform:none; }
+
+  .empty-state{ color:var(--muted); text-align:center; padding:40px 0; font-size:0.9rem; }
+
+  .add-quest-toggle{
+    background:none; border:1px dashed var(--line); color:var(--muted); border-radius:10px;
+    padding:12px; width:100%; cursor:pointer; font-family:var(--mono); font-size:0.85rem; margin-bottom:14px;
+  }
+  .add-quest-toggle:hover{ border-color:var(--xp-b); color:var(--xp-b); }
+  .add-form{
+    display:none; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:20px;
+    margin-bottom:30px; gap:12px; grid-template-columns:2fr 1fr 1fr auto;
+  }
+  .add-form.open{ display:grid; }
+  @media (max-width:640px){ .add-form{ grid-template-columns:1fr; } }
+  .add-form label{ font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:5px; }
+  .add-form input, .add-form select{
+    width:100%; background:var(--panel-hi); border:1px solid var(--line); color:var(--text);
+    border-radius:7px; padding:9px 10px; font-family:var(--sans); font-size:0.9rem;
+  }
+  .add-form button{
+    align-self:end; background:var(--xp-a); color:#fff; border:none; border-radius:7px;
+    padding:10px 16px; font-weight:700; cursor:pointer; font-size:0.85rem;
+  }
+
+  .reset-row{ text-align:center; margin-top:10px; }
+  .reset-btn{
+    background:none; border:1px solid var(--line); color:var(--muted); font-family:var(--mono);
+    font-size:0.75rem; padding:8px 14px; border-radius:8px; cursor:pointer;
+  }
+  .reset-btn:hover{ border-color:var(--danger); color:var(--danger); }
+
+  #toast{
+    position:fixed; bottom:24px; left:50%; transform:translate(-50%,20px);
+    background:var(--panel-hi); border:1px solid var(--gold); color:var(--text);
+    padding:14px 22px; border-radius:12px; font-weight:700; font-size:0.92rem;
+    display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none;
+    transition:opacity .3s ease, transform .3s ease; z-index:100; box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  }
+  #toast.show{ opacity:1; transform:translate(-50%,0); }
+  #toast .badge{ background:var(--gold); color:#2a1d00; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0; }
+
+  .section-title{ display:block; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin:0 0 14px; font-family:var(--mono); }
+
+  /* Top row + Google auth */
+  .top-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:24px; }
+  .google-auth{ display:flex; align-items:center; gap:10px; }
+  .g-avatar{ width:28px; height:28px; border-radius:50%; }
+  .g-name{ font-size:0.82rem; color:var(--muted); }
+  .g-signout{ background:none; border:1px solid var(--line); color:var(--muted); font-size:0.72rem; padding:5px 10px; border-radius:6px; cursor:pointer; font-family:var(--mono); }
+  .g-signout:hover{ border-color:var(--danger); color:var(--danger); }
+  .g-signin-btn{
+    background:var(--panel); border:1px solid var(--line); color:var(--text);
+    font-size:0.82rem; font-weight:600; padding:8px 16px; border-radius:8px; cursor:pointer;
+    font-family:var(--sans); transition:border-color .2s ease, color .2s ease;
+  }
+  .g-signin-btn:hover{ border-color:var(--xp-b); color:var(--xp-b); }
+
+  /* Difficulty tags + quest tip */
+  .quest-meta{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .diff-tag{ font-family:var(--mono); font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em; padding:2px 8px; border-radius:5px; }
+  .diff-easy{ background:rgba(74,222,128,0.12); color:#4ADE80; border:1px solid rgba(74,222,128,0.3); }
+  .diff-medium{ background:rgba(255,194,75,0.12); color:var(--gold); border:1px solid rgba(255,194,75,0.3); }
+  .diff-hard{ background:rgba(255,92,122,0.12); color:var(--danger); border:1px solid rgba(255,92,122,0.3); }
+  .quest-tip{ font-size:0.8rem; color:var(--muted); margin:0; font-style:italic; }
+
+  /* Achievements */
+  .badges-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; }
+  .badge-chip{
+    font-size:0.78rem; padding:6px 12px; border-radius:999px; border:1px solid var(--line);
+    color:var(--muted); background:var(--panel); opacity:0.55;
+  }
+  .badge-chip.unlocked{ opacity:1; border-color:rgba(255,194,75,0.4); background:rgba(255,194,75,0.08); color:var(--gold); font-weight:600; }
+
+  /* Boss / Daily Challenge card */
+  .boss-card{
+    background:linear-gradient(135deg, rgba(255,194,75,0.08), rgba(124,92,252,0.06));
+    border:1px solid rgba(255,194,75,0.35); border-radius:12px; padding:20px; margin-bottom:28px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .boss-card.done{ opacity:0.7; }
+  .boss-label{ font-family:var(--mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold); }
+  .boss-btn{ background:var(--gold); color:#2a1d00; }
+  .boss-btn:hover{ background:#ffcf70; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" class="top-link">← Back to portfolio</a>
+
+  <div class="top-row">
+    <h1 style="margin:0;">🏆 FitQuest</h1>
+    <div class="google-auth" id="googleAuth"></div>
+  </div>
+
+  <div class="hud">
+    <div class="level-badge">
+      <div class="level-badge-inner">
+        <span class="lv-num" id="lvNum">1</span>
+        <span class="lv-label">LVL</span>
+      </div>
+    </div>
+    <div class="hud-mid">
+      <div class="player-name-row">
+        <input type="text" id="playerName" value="Player One" maxlength="20" aria-label="Player name">
+        <span class="rank-tag" id="rankTag">Rookie</span>
+      </div>
+      <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+      <div class="xp-caption" id="xpCaption">0 / 100 XP</div>
+    </div>
+    <div class="streak-box">
+      <div class="streak-num" id="streakNum">0</div>
+      <div class="streak-label">🔥 Day Streak</div>
+    </div>
+  </div>
+
+  <span class="section-title">Achievements</span>
+  <div class="badges-row" id="badgesRow"></div>
+
+  <span class="section-title" style="margin-top:8px;">Daily Challenge <span style="color:var(--muted); text-transform:none; letter-spacing:0;">— one tough bonus quest, resets tomorrow</span></span>
+  <div class="boss-card" id="bossCard"></div>
+
+  <span class="section-title">Today's Quests <span style="color:var(--muted); text-transform:none; letter-spacing:0;">— 8 fresh picks, new set tomorrow</span></span>
+  <div class="filters" id="filters">
+    <button class="chip active" data-filter="All">All</button>
+    <button class="chip" data-filter="Strength">Strength</button>
+    <button class="chip" data-filter="Cardio">Cardio</button>
+    <button class="chip" data-filter="Flexibility">Flexibility</button>
+    <button class="chip" data-filter="Wellness">Wellness</button>
+  </div>
+
+  <div class="quest-grid" id="questGrid"></div>
+
+  <button class="add-quest-toggle" id="addToggle" type="button" aria-expanded="false">+ Add a custom quest</button>
+  <div class="add-form" id="addForm">
+    <div>
+      <label for="qName">Quest name</label>
+      <input type="text" id="qName" placeholder="e.g. 20-min bike ride" maxlength="40">
+    </div>
+    <div>
+      <label for="qCat">Category</label>
+      <select id="qCat">
+        <option>Strength</option>
+        <option>Cardio</option>
+        <option>Flexibility</option>
+        <option>Wellness</option>
+      </select>
+    </div>
+    <div>
+      <label for="qXp">XP reward</label>
+      <input type="number" id="qXp" value="15" min="5" max="100" step="5">
+    </div>
+    <button type="button" id="addQuestBtn">Add</button>
+  </div>
+
+  <div class="reset-row">
+    <button class="reset-btn" id="resetBtn" type="button">Reset all progress</button>
+  </div>
+</div>
+
+<div id="toast"><span class="badge">★</span><span id="toastMsg"></span></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "fitquest_state_v1";
+  var todayStr = function(){ return new Date().toISOString().slice(0,10); };
+  var yesterdayStr = function(){
+    var d = new Date(); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10);
+  };
+
+  // A larger pool to pick from — 2 quests per category are drawn from here each day.
+  // Each quest now carries a difficulty tag and a short how-to tip.
+  var questPool = [
+    { id:"s1", name:"20 Push-ups", category:"Strength", difficulty:"Medium", xp:15, tip:"Keep your core tight and lower until your elbows hit about 90°." },
+    { id:"s2", name:"30 Squats", category:"Strength", difficulty:"Medium", xp:15, tip:"Keep your knees behind your toes and your chest up." },
+    { id:"s3", name:"1-Minute Plank", category:"Strength", difficulty:"Easy", xp:10, tip:"Keep your body in a straight line from head to heels." },
+    { id:"s4", name:"15 Lunges (each leg)", category:"Strength", difficulty:"Medium", xp:15, tip:"Step forward and lower until both knees are near 90°." },
+    { id:"s5", name:"20 Sit-ups", category:"Strength", difficulty:"Easy", xp:10, tip:"Keep feet flat and hands lightly behind your head." },
+    { id:"s6", name:"10 Burpees", category:"Strength", difficulty:"Hard", xp:25, tip:"Jump, drop to a push-up, then explode back up." },
+    { id:"c1", name:"15-Minute Walk or Jog", category:"Cardio", difficulty:"Easy", xp:10, tip:"Keep a pace where you can still talk, but feel your heart rate up." },
+    { id:"c2", name:"5-Minute Jump Rope", category:"Cardio", difficulty:"Medium", xp:15, tip:"Stay light on your feet — use your wrists, not your arms." },
+    { id:"c3", name:"10-Minute Cycling", category:"Cardio", difficulty:"Easy", xp:10, tip:"Keep a steady cadence at a moderate effort." },
+    { id:"c4", name:"Climb 3 Flights of Stairs", category:"Cardio", difficulty:"Easy", xp:10, tip:"Take stairs two at a time for extra intensity." },
+    { id:"c5", name:"20-Minute Dance Session", category:"Cardio", difficulty:"Medium", xp:15, tip:"Pick your favorite playlist and just move." },
+    { id:"c6", name:"30-Minute Run", category:"Cardio", difficulty:"Hard", xp:25, tip:"Pace yourself — finishing strong matters more than starting fast." },
+    { id:"f1", name:"10-Minute Stretch Routine", category:"Flexibility", difficulty:"Easy", xp:10, tip:"Hold each stretch for 20–30 seconds, don't bounce." },
+    { id:"f2", name:"5-Minute Yoga Flow", category:"Flexibility", difficulty:"Easy", xp:10, tip:"Sync your breath with each movement." },
+    { id:"f3", name:"Touch Your Toes x10", category:"Flexibility", difficulty:"Easy", xp:5, tip:"Bend from the hips, knees slightly soft." },
+    { id:"f4", name:"Shoulder & Neck Stretch", category:"Flexibility", difficulty:"Easy", xp:5, tip:"Great after long hours at a desk." },
+    { id:"f5", name:"15-Minute Deep Stretch Session", category:"Flexibility", difficulty:"Medium", xp:15, tip:"Focus on the areas that feel tightest today." },
+    { id:"w1", name:"Drink 8 Glasses of Water", category:"Wellness", difficulty:"Easy", xp:10, tip:"Keep a bottle nearby as a visual reminder." },
+    { id:"w2", name:"Get 7+ Hours of Sleep", category:"Wellness", difficulty:"Medium", xp:15, tip:"Consistency matters more than the exact bedtime." },
+    { id:"w3", name:"5-Minute Meditation", category:"Wellness", difficulty:"Easy", xp:10, tip:"Just focus on your breath — a wandering mind is normal." },
+    { id:"w4", name:"Eat a Serving of Vegetables", category:"Wellness", difficulty:"Easy", xp:10, tip:"Any vegetable counts — variety is a bonus." },
+    { id:"w5", name:"No Screens 30 Min Before Bed", category:"Wellness", difficulty:"Medium", xp:10, tip:"Try reading or stretching instead." },
+    { id:"w6", name:"No Added Sugar Today", category:"Wellness", difficulty:"Hard", xp:20, tip:"Check labels — sugar hides in a lot of packaged food." }
+  ];
+
+  // One extra-hard bonus quest per day, shown separately above the regular quests.
+  var bossPool = [
+    { id:"b1", name:"50 Push-ups Challenge", xp:40, tip:"Break it into sets if needed — 5×10 works great." },
+    { id:"b2", name:"5K Run", xp:45, tip:"Pace yourself: aim for a steady, sustainable speed." },
+    { id:"b3", name:"100 Squats Challenge", xp:40, tip:"Split into rounds of 20 with short rests between." },
+    { id:"b4", name:"10-Minute Plank Ladder", xp:40, tip:"Alternate 30s plank / 15s rest until you hit 10 minutes total." },
+    { id:"b5", name:"Full Body Circuit (3 Rounds)", xp:45, tip:"Push-ups, squats, lunges, plank — 3 rounds, minimal rest." }
+  ];
+
+  // Deterministic "random" so the same date always produces the same picks
+  // (stable if you reload today, different once the date changes).
+  function hashStr(str){
+    var h = 0;
+    for (var i = 0; i < str.length; i++) { h = (h << 5) - h + str.charCodeAt(i); h |= 0; }
+    return h;
+  }
+  function seededRandom(seed){
+    return function(){
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function seededShuffle(arr, seed){
+    var a = arr.slice();
+    var rng = seededRandom(seed);
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+  function todaysDefaultQuests(){
+    var categories = ["Strength", "Cardio", "Flexibility", "Wellness"];
+    var perCategory = 2;
+    var picks = [];
+    categories.forEach(function(cat){
+      var inCat = questPool.filter(function(q){ return q.category === cat; });
+      var seed = hashStr(todayStr() + "|" + cat);
+      var shuffled = seededShuffle(inCat, seed);
+      picks = picks.concat(shuffled.slice(0, perCategory));
+    });
+    return picks;
+  }
+  function todaysBossQuest(){
+    var seed = hashStr(todayStr() + "|boss");
+    return seededShuffle(bossPool, seed)[0];
+  }
+
+  function loadState(){
+    var raw = localStorage.getItem(STORAGE_KEY);
+    var state;
+    if (raw) {
+      try { state = JSON.parse(raw); } catch(e) { state = null; }
+    }
+    if (!state) {
+      state = { playerName:"Player One", xp:0, streak:0, lastCompletionDate:null, completedToday:[], completedDate:todayStr(), customQuests:[] };
+    }
+    if (state.completedDate !== todayStr()) {
+      state.completedToday = [];
+      state.completedDate = todayStr();
+    }
+    if (!state.customQuests) state.customQuests = [];
+    // Backfill fields added in later versions so existing saves keep working.
+    if (typeof state.longestStreak !== "number") state.longestStreak = state.streak || 0;
+    if (typeof state.totalQuestsCompleted !== "number") state.totalQuestsCompleted = 0;
+    if (!state.badges) state.badges = [];
+    return state;
+  }
+  function saveState(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    syncStateToCloud(); // no-op if not signed in / not configured — defined further below
+  }
+
+  var state = loadState();
+
+  function allQuests(){ return todaysDefaultQuests().concat(state.customQuests); }
+
+  function levelFromXp(xp){
+    var level = 1, remaining = xp;
+    while (remaining >= level * 100) {
+      remaining -= level * 100;
+      level++;
+    }
+    return { level: level, into: remaining, need: level * 100 };
+  }
+  function rankForLevel(level){
+    if (level >= 11) return "Legend";
+    if (level >= 8) return "Champion";
+    if (level >= 5) return "Warrior";
+    if (level >= 3) return "Challenger";
+    return "Rookie";
+  }
+
+  var lvNum = document.getElementById("lvNum");
+  var rankTag = document.getElementById("rankTag");
+  var xpFill = document.getElementById("xpFill");
+  var xpCaption = document.getElementById("xpCaption");
+  var streakNum = document.getElementById("streakNum");
+  var playerNameInput = document.getElementById("playerName");
+  var questGrid = document.getElementById("questGrid");
+  var currentFilter = "All";
+
+  function renderHud(){
+    var lv = levelFromXp(state.xp);
+    lvNum.textContent = lv.level;
+    rankTag.textContent = rankForLevel(lv.level);
+    var pct = Math.round((lv.into / lv.need) * 100);
+    xpFill.style.width = pct + "%";
+    xpCaption.textContent = lv.into + " / " + lv.need + " XP";
+    streakNum.textContent = state.streak;
+    playerNameInput.value = state.playerName;
+  }
+
+  function renderQuests(){
+    var quests = allQuests().filter(function(q){ return currentFilter === "All" || q.category === currentFilter; });
+    questGrid.innerHTML = "";
+    if (quests.length === 0) {
+      questGrid.innerHTML = '<div class="empty-state">No quests in this category yet.</div>';
+      return;
+    }
+    quests.forEach(function(q){
+      var done = state.completedToday.indexOf(q.id) !== -1;
+      var diff = q.difficulty || "Medium";
+      var card = document.createElement("div");
+      card.className = "quest-card" + (done ? " done" : "");
+      card.innerHTML =
+        '<div class="quest-top"><span class="quest-name">' + q.name + '</span><span class="quest-cat">' + q.category + '</span></div>' +
+        '<div class="quest-meta"><span class="diff-tag diff-' + diff.toLowerCase() + '">' + diff + '</span><span class="quest-xp">+' + q.xp + ' XP</span></div>' +
+        (q.tip ? '<p class="quest-tip">' + q.tip + '</p>' : '') +
+        '<button class="quest-btn ' + (done ? 'done-btn' : 'todo') + '" ' + (done ? 'disabled' : '') + '>' +
+        (done ? '✓ Completed' : 'Complete Quest') + '</button>';
+      if (!done) {
+        card.querySelector("button").addEventListener("click", function(){ completeQuest(q); });
+      }
+      questGrid.appendChild(card);
+    });
+  }
+
+  /* ---- Daily Boss Challenge ---- */
+  var bossCard = document.getElementById("bossCard");
+  function renderBoss(){
+    var boss = todaysBossQuest();
+    var done = state.completedToday.indexOf(boss.id) !== -1;
+    bossCard.className = "boss-card" + (done ? " done" : "");
+    bossCard.innerHTML =
+      '<div class="boss-label">⚔ Daily Challenge</div>' +
+      '<div class="quest-top"><span class="quest-name">' + boss.name + '</span></div>' +
+      '<div class="quest-meta"><span class="diff-tag diff-hard">Hard</span><span class="quest-xp">+' + boss.xp + ' XP</span></div>' +
+      '<p class="quest-tip">' + boss.tip + '</p>' +
+      '<button class="quest-btn ' + (done ? 'done-btn' : 'boss-btn') + '" ' + (done ? 'disabled' : '') + '>' +
+      (done ? '✓ Challenge Complete' : 'Accept Challenge') + '</button>';
+    if (!done) {
+      bossCard.querySelector("button").addEventListener("click", function(){ completeQuest(boss); });
+    }
+  }
+
+  /* ---- Achievements ---- */
+  var badgeDefs = [
+    { id:"streak3", label:"🔥 3-Day Streak", test:function(){ return state.longestStreak >= 3; } },
+    { id:"streak7", label:"🔥 7-Day Streak", test:function(){ return state.longestStreak >= 7; } },
+    { id:"level5", label:"⭐ Level 5", test:function(){ return levelFromXp(state.xp).level >= 5; } },
+    { id:"level10", label:"🏆 Level 10", test:function(){ return levelFromXp(state.xp).level >= 10; } },
+    { id:"quests25", label:"✅ 25 Quests Done", test:function(){ return state.totalQuestsCompleted >= 25; } },
+    { id:"quests100", label:"✅ 100 Quests Done", test:function(){ return state.totalQuestsCompleted >= 100; } },
+    { id:"boss1", label:"⚔ First Boss Defeated", test:function(){ return state.badges.indexOf("boss1") !== -1 || bossPool.some(function(b){ return state.completedToday.indexOf(b.id) !== -1; }); } }
+  ];
+  var badgesRow = document.getElementById("badgesRow");
+  function checkAndRenderBadges(){
+    var newlyEarned = [];
+    badgeDefs.forEach(function(b){
+      var earned = b.test();
+      var alreadyKnown = state.badges.indexOf(b.id) !== -1;
+      if (earned && !alreadyKnown) {
+        state.badges.push(b.id);
+        newlyEarned.push(b.label);
+      }
+    });
+    if (newlyEarned.length) saveState();
+
+    badgesRow.innerHTML = badgeDefs.map(function(b){
+      var unlocked = state.badges.indexOf(b.id) !== -1;
+      return '<span class="badge-chip' + (unlocked ? ' unlocked' : '') + '">' + b.label + '</span>';
+    }).join("");
+
+    return newlyEarned;
+  }
+
+  function completeQuest(q){
+    var prevLevel = levelFromXp(state.xp).level;
+
+    state.completedToday.push(q.id);
+    state.xp += q.xp;
+    state.totalQuestsCompleted += 1;
+
+    var firstToday = state.completedToday.length === 1;
+    if (firstToday) {
+      if (state.lastCompletionDate === yesterdayStr()) {
+        state.streak += 1;
+      } else if (state.lastCompletionDate !== todayStr()) {
+        state.streak = 1;
+      }
+      state.lastCompletionDate = todayStr();
+    }
+    if (state.streak > state.longestStreak) state.longestStreak = state.streak;
+
+    saveState();
+    renderHud();
+    renderQuests();
+    renderBoss();
+    var newBadges = checkAndRenderBadges();
+
+    var newLevel = levelFromXp(state.xp).level;
+    if (newLevel > prevLevel) {
+      showToast("Level up! You're now level " + newLevel + " — " + rankForLevel(newLevel) + "!");
+    } else if (newBadges.length) {
+      showToast("Achievement unlocked: " + newBadges[0]);
+    } else {
+      showToast("+" + q.xp + " XP — quest complete!");
+    }
+  }
+
+  var toast = document.getElementById("toast");
+  var toastMsg = document.getElementById("toastMsg");
+  var toastTimer = null;
+  function showToast(msg){
+    toastMsg.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove("show"); }, 2600);
+  }
+
+  playerNameInput.addEventListener("change", function(){
+    state.playerName = playerNameInput.value.trim() || "Player One";
+    saveState();
+  });
+
+  document.getElementById("filters").addEventListener("click", function(e){
+    var btn = e.target.closest(".chip");
+    if (!btn) return;
+    document.querySelectorAll("#filters .chip").forEach(function(c){ c.classList.remove("active"); });
+    btn.classList.add("active");
+    currentFilter = btn.dataset.filter;
+    renderQuests();
+  });
+
+  var addToggle = document.getElementById("addToggle");
+  var addForm = document.getElementById("addForm");
+  addToggle.addEventListener("click", function(){
+    var open = addForm.classList.toggle("open");
+    addToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    addToggle.textContent = open ? "− Close" : "+ Add a custom quest";
+  });
+  document.getElementById("addQuestBtn").addEventListener("click", function(){
+    var name = document.getElementById("qName").value.trim();
+    var cat = document.getElementById("qCat").value;
+    var xp = parseInt(document.getElementById("qXp").value, 10) || 15;
+    if (!name) { document.getElementById("qName").focus(); return; }
+    var id = "custom_" + Date.now();
+    state.customQuests.push({ id:id, name:name, category:cat, xp:Math.max(5, Math.min(100, xp)) });
+    saveState();
+    document.getElementById("qName").value = "";
+    renderQuests();
+    showToast("Custom quest added!");
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", function(){
+    if (!confirm("Reset all FitQuest progress? This can't be undone.")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    state = loadState();
+    syncStateToCloud(); // overwrite cloud copy too, if signed in
+    renderHud();
+    renderQuests();
+    renderBoss();
+    checkAndRenderBadges();
+    renderGoogleStatus();
+  });
+
+  /* ---- Cloud sync (Firebase Auth + Firestore) ----
+     Sign in with Google to save your progress to the cloud, not just this browser.
+     Requires your own free Firebase project — see README.md for setup steps.
+     If not configured, or offline, the app keeps working fine in local-only "guest" mode. */
+  var firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  var firebaseReady = false;
+  var fbAuth = null, fbDb = null, currentUser = null;
+
+  try {
+    if (firebaseConfig.apiKey.indexOf("YOUR_") !== 0) {
+      var fbApp = initializeApp(firebaseConfig);
+      fbAuth = getAuth(fbApp);
+      fbDb = getFirestore(fbApp);
+      firebaseReady = true;
+    }
+  } catch (e) {
+    console.warn("Firebase did not initialize — running in local-only mode.", e);
+  }
+
+  var googleAuth = document.getElementById("googleAuth");
+
+  function renderGoogleStatus(){
+    if (!firebaseReady) {
+      googleAuth.innerHTML = '<span class="g-name" style="opacity:0.65;">Cloud sync not set up yet</span>';
+      return;
+    }
+    if (currentUser) {
+      googleAuth.innerHTML =
+        '<img src="' + (currentUser.photoURL || "") + '" alt="" class="g-avatar">' +
+        '<span class="g-name">' + currentUser.displayName + ' <span style="color:var(--xp-b);">· cloud sync on</span></span>' +
+        '<button type="button" id="googleSignOut" class="g-signout">Sign out</button>';
+      document.getElementById("googleSignOut").addEventListener("click", function(){ signOut(fbAuth); });
+    } else {
+      googleAuth.innerHTML = '<button type="button" id="googleSignInBtn" class="g-signin-btn">Sign in with Google</button>';
+      document.getElementById("googleSignInBtn").addEventListener("click", function(){
+        signInWithPopup(fbAuth, new GoogleAuthProvider()).catch(function(err){
+          console.error(err);
+          showToast("Sign-in failed — see console for details.");
+        });
+      });
+    }
+  }
+
+  function syncStateToCloud(){
+    if (!firebaseReady || !currentUser) return;
+    setDoc(doc(fbDb, "fitquest_users", currentUser.uid), state).catch(function(e){
+      console.warn("Cloud save failed:", e);
+    });
+  }
+
+  function loadStateFromCloud(uid){
+    return getDoc(doc(fbDb, "fitquest_users", uid)).then(function(snap){
+      if (snap.exists()) {
+        // Cloud becomes the source of truth once signed in.
+        state = Object.assign({}, state, snap.data());
+        if (state.completedDate !== todayStr()) {
+          state.completedToday = [];
+          state.completedDate = todayStr();
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } else {
+        // First sign-in on this account — push current local/guest progress up as a starting point.
+        syncStateToCloud();
+      }
+    }).catch(function(e){ console.warn("Cloud load failed:", e); });
+  }
+
+  if (firebaseReady) {
+    onAuthStateChanged(fbAuth, function(user){
+      currentUser = user;
+      if (user) {
+        state.playerName = user.displayName || state.playerName;
+        loadStateFromCloud(user.uid).then(function(){
+          renderHud(); renderQuests(); renderBoss(); checkAndRenderBadges(); renderGoogleStatus();
+          showToast("Signed in — progress synced!");
+        });
+      } else {
+        renderGoogleStatus();
+      }
+    });
+  }
+
+  renderHud();
+  renderQuests();
+  renderBoss();
+  checkAndRenderBadges();
+  renderGoogleStatus();
+})();
+</script>
+</body>
+</html>
