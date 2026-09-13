@@ -81,29 +81,16 @@
   }
 
   /* Hero */
-  .hero{ position:relative; overflow:hidden; padding:100px 0 80px; }
-  .blob{ position:absolute; border-radius:50%; filter:blur(60px); opacity:0.35; z-index:0; }
-  .blob-a{ width:420px; height:420px; background:var(--primary); top:-160px; right:-120px; }
-  .blob-b{ width:320px; height:320px; background:var(--accent); bottom:-140px; left:-100px; opacity:0.22; }
-  .hero-inner{ position:relative; z-index:1; display:grid; grid-template-columns:auto 1fr; gap:44px; align-items:center; }
+  .hero{ position:relative; padding:90px 0 70px; border-bottom:1px solid var(--line); }
+  .hero-inner{ position:relative; display:grid; grid-template-columns:auto 1fr; gap:44px; align-items:center; }
   @media (max-width:780px){ .hero-inner{ grid-template-columns:1fr; text-align:center; } .hero-inner .status-chip{ margin-left:auto; margin-right:auto; } }
 
-  .avatar-ring{
-    width:132px; height:132px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    background:var(--panel);
-    border:2px dashed var(--primary);
-    position:relative;
-    animation:spin 22s linear infinite;
-    flex-shrink:0;
-  }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
-  .avatar-inner{
-    width:104px; height:104px; border-radius:50%;
+  .avatar-badge{
+    width:104px; height:104px; border-radius:50%; flex-shrink:0;
     background:linear-gradient(135deg,var(--primary),var(--primary-dark));
     color:#fff; display:flex; align-items:center; justify-content:center;
     font-size:2rem; font-weight:800; letter-spacing:0.02em;
-    animation:spin 22s linear infinite reverse;
+    margin:0 auto;
   }
 
   .status-chip{
@@ -195,6 +182,18 @@
 
   /* Projects */
   .project-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:22px; }
+
+  /* Workflow diagram */
+  .workflow-diagram{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px; overflow-x:auto;
+  }
+  .workflow-diagram svg{ display:block; min-width:600px; width:100%; height:auto; }
+  .workflow-legend{ display:flex; gap:20px; flex-wrap:wrap; margin-top:16px; font-size:0.86rem; color:var(--muted); }
+  .workflow-legend .dot{ display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; vertical-align:middle; }
+  .dot-teal{ background:#0F766E; }
+  .dot-coral{ background:#E8604C; }
+  .dot-amber{ background:#D97706; }
   .card{
     background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:26px;
     transition:border-color .2s ease, transform .2s ease;
@@ -252,18 +251,15 @@
       <li><a href="#skills" data-nav>Skills</a></li>
       <li><a href="#experience" data-nav>Experience</a></li>
       <li><a href="#projects" data-nav>Projects</a></li>
+      <li><a href="#workflow" data-nav>Workflow</a></li>
       <li><a href="#contact" data-nav>Contact</a></li>
     </ul>
   </div>
 </header>
 
 <section class="hero" id="top">
-  <div class="blob blob-a"></div>
-  <div class="blob blob-b"></div>
   <div class="wrap hero-inner">
-    <div class="avatar-ring">
-      <div class="avatar-inner">JR</div>
-    </div>
+    <div class="avatar-badge">JR</div>
     <div>
       <div class="status-chip"><span class="led"></span> Open to remote work</div>
       <h1>John Matthew Rey</h1>
@@ -371,11 +367,107 @@
         <a href="fitquest.html" class="card-link" target="_blank" rel="noopener">Play the demo →</a>
       </div>
       <div class="card">
-        <h3>Workout Tracker</h3>
-        <p>A local-first fitness log with a daily goal and a dependency-free weekly report, built with PHP and a MySQL database — my first hands-on project connecting a front end to a real database.</p>
-        <div class="tags"><span class="tag">PHP</span><span class="tag">MySQL</span><span class="tag">JavaScript</span></div>
-        <span class="card-link" style="color:var(--muted); border-color:var(--line); cursor:default;">Runs locally via XAMPP</span>
+        <h3>After-Sales Case Escalation Workflow</h3>
+        <p>A mapped-out version of the process I follow daily at Abenson Ventures — from first customer contact through CRM logging, supplier coordination, and replacement escalation, to closing the case.</p>
+        <div class="tags"><span class="tag">ZOHO CRM</span><span class="tag">Process Design</span><span class="tag">After-Sales</span></div>
+        <a href="#workflow" class="card-link">View the workflow ↓</a>
       </div>
+    </div>
+  </div>
+</section>
+
+<section id="workflow">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Workflow</div>
+      <h2>How I handle a case, start to finish</h2>
+    </div>
+    <p class="reveal" style="color:var(--muted); max-width:65ch; margin-top:-20px; margin-bottom:28px;">
+      This is the actual process I follow as Counter Support Staff at Abenson Ventures for an after-sales case — from the first customer conversation through CRM logging and, when needed, escalation for a unit replacement.
+    </p>
+    <div class="workflow-diagram reveal">
+      <svg viewBox="0 0 760 950" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flowchart of the after-sales case escalation process, described in the paragraph above">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#5B6C69"/>
+          </marker>
+        </defs>
+
+        <!-- Start -->
+        <rect x="50" y="16" width="300" height="46" rx="23" fill="#0F766E"/>
+        <text x="200" y="44" text-anchor="middle" fill="#fff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">After-Sales Case Begins</text>
+        <path d="M200,62 L200,96" fill="none" stroke="#5B6C69" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- Step 1 -->
+        <rect x="50" y="98" width="300" height="58" rx="8" fill="#E6F3F1" stroke="#0F766E"/>
+        <text x="200" y="122" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12.5">Talk to customer &#8212; ask questions</text>
+        <text x="200" y="140" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12.5">about the item and the issue</text>
+        <path d="M200,156 L200,190" fill="none" stroke="#5B6C69" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- Step 2 -->
+        <rect x="50" y="192" width="300" height="58" rx="8" fill="#E6F3F1" stroke="#0F766E"/>
+        <text x="200" y="216" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12.5">Request the required documents</text>
+        <text x="200" y="234" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12.5">for the case</text>
+        <path d="M200,250 L200,284" fill="none" stroke="#5B6C69" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- Step 3 -->
+        <rect x="50" y="286" width="300" height="50" rx="8" fill="#E6F3F1" stroke="#0F766E"/>
+        <text x="200" y="316" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12.5">Create a case ticket in ZOHO CRM</text>
+        <path d="M200,336 L200,370" fill="none" stroke="#5B6C69" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- Step 4 -->
+        <rect x="50" y="372" width="300" height="58" rx="8" fill="#E6F3F1" stroke="#0F766E"/>
+        <text x="200" y="396" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12.5">Call supplier customer service &#8212;</text>
+        <text x="200" y="414" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12.5">book ticket &amp; schedule tech visit</text>
+        <path d="M200,430 L200,464" fill="none" stroke="#5B6C69" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- Step 5 -->
+        <rect x="50" y="466" width="300" height="50" rx="8" fill="#E6F3F1" stroke="#0F766E"/>
+        <text x="200" y="496" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12.5">Obtain the reference number</text>
+        <path d="M200,516 L200,550" fill="none" stroke="#5B6C69" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- Decision diamond -->
+        <polygon points="200,552 350,610 200,668 50,610" fill="#FEF3E2" stroke="#D97706" stroke-width="1.5"/>
+        <text x="200" y="604" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700">Customer insists on</text>
+        <text x="200" y="620" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700">unit replacement?</text>
+
+        <!-- No path straight down -->
+        <path d="M200,668 L200,762" fill="none" stroke="#5B6C69" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="214" y="700" fill="#0F766E" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700">No</text>
+
+        <!-- Yes path right to escalation -->
+        <path d="M350,610 L450,610" fill="none" stroke="#E8604C" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="400" y="602" text-anchor="middle" fill="#E8604C" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="700">Yes</text>
+
+        <!-- Step 6 (escalation) -->
+        <rect x="450" y="582" width="260" height="56" rx="8" fill="#FBEAE7" stroke="#E8604C"/>
+        <text x="580" y="606" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12.5">Escalate to Abenson Customer</text>
+        <text x="580" y="623" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12.5">Care for replacement review</text>
+        <path d="M580,638 L580,676" fill="none" stroke="#5B6C69" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="596" y="662" fill="#E8604C" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-style="italic">if approved</text>
+
+        <!-- Step 7 (escalation) -->
+        <rect x="450" y="678" width="260" height="56" rx="8" fill="#FBEAE7" stroke="#E8604C"/>
+        <text x="580" y="702" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12.5">Forward documents to the</text>
+        <text x="580" y="719" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12.5">department for replacement</text>
+
+        <!-- Merge arrow from step 7 back into step 8 -->
+        <path d="M580,734 L580,788 L350,788" fill="none" stroke="#5B6C69" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- Step 8 -->
+        <rect x="50" y="764" width="300" height="50" rx="8" fill="#E6F3F1" stroke="#0F766E"/>
+        <text x="200" y="794" text-anchor="middle" fill="#1B2B29" font-family="Helvetica, Arial, sans-serif" font-size="12.5">Close the ticket in ZOHO CRM</text>
+        <path d="M200,814 L200,848" fill="none" stroke="#5B6C69" stroke-width="2" marker-end="url(#arrow)"/>
+
+        <!-- End -->
+        <rect x="50" y="850" width="300" height="46" rx="23" fill="#0F766E"/>
+        <text x="200" y="878" text-anchor="middle" fill="#fff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">Case Resolved</text>
+      </svg>
+    </div>
+    <div class="workflow-legend reveal">
+      <span><i class="dot dot-teal"></i> Standard process</span>
+      <span><i class="dot dot-coral"></i> Escalation path</span>
+      <span><i class="dot dot-amber"></i> Decision point</span>
     </div>
   </div>
 </section>
@@ -446,7 +538,7 @@
   });
 
   /* Active nav on scroll */
-  var sectionIds = ["about","skills","experience","projects","contact"];
+  var sectionIds = ["about","skills","experience","projects","workflow","contact"];
   var navAnchors = document.querySelectorAll("[data-nav]");
   var navObserver = new IntersectionObserver(function(entries){
     entries.forEach(function(entry){
