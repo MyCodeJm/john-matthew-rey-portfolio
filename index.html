@@ -194,6 +194,17 @@
   .dot-teal{ background:#0F766E; }
   .dot-coral{ background:#E8604C; }
   .dot-amber{ background:#D97706; }
+
+  /* Expense dashboard project */
+  .dash-build-grid{ display:grid; grid-template-columns:1fr 1fr; gap:40px; }
+  @media (max-width:780px){ .dash-build-grid{ grid-template-columns:1fr; gap:28px; } }
+  .dash-build-head{ font-size:1.02rem; margin-bottom:12px; color:var(--primary-dark); }
+  .dash-build-list{ margin:0; padding-left:18px; color:var(--muted); font-size:0.92rem; }
+  .dash-build-list li{ margin-bottom:10px; line-height:1.55; }
+  .dash-build-list code{
+    background:#E6F3F1; color:var(--primary-dark); padding:1px 6px; border-radius:4px;
+    font-family:var(--mono); font-size:0.85em;
+  }
   .card{
     background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:26px;
     transition:border-color .2s ease, transform .2s ease;
@@ -252,6 +263,7 @@
       <li><a href="#experience" data-nav>Experience</a></li>
       <li><a href="#projects" data-nav>Projects</a></li>
       <li><a href="#workflow" data-nav>Workflow</a></li>
+      <li><a href="#expense-dashboard" data-nav>Excel</a></li>
       <li><a href="#contact" data-nav>Contact</a></li>
     </ul>
   </div>
@@ -291,7 +303,7 @@
         <div class="eyebrow" style="margin-bottom:14px;">Education</div>
         <div class="deg">Bachelor of Science in Information Technology</div>
         <div class="school">Dalubhasaan ng Lungsod ng Lucena</div>
-        <div class="yr">Graduate <span class="placeholder">July 2024</span></div>
+        <div class="yr">Graduate <span class="placeholder">(add year)</span></div>
       </div>
     </div>
   </div>
@@ -339,7 +351,7 @@
       <div class="tl-item">
         <div class="tl-head">
           <span class="tl-role">Sales Call Center Agent</span>
-          <span class="tl-dates placeholder">June 2022-July 2023</span>
+          <span class="tl-dates placeholder">(add dates)</span>
         </div>
         <div class="tl-org">Derive</div>
         <ul>
@@ -371,6 +383,12 @@
         <p>A mapped-out version of the process I follow daily at Abenson Ventures — from first customer contact through CRM logging, supplier coordination, and replacement escalation, to closing the case.</p>
         <div class="tags"><span class="tag">ZOHO CRM</span><span class="tag">Process Design</span><span class="tag">After-Sales</span></div>
         <a href="#workflow" class="card-link">View the workflow ↓</a>
+      </div>
+      <div class="card">
+        <h3>Personal Expense Dashboard</h3>
+        <p>A self-updating Excel dashboard for tracking personal spending — formula-driven KPIs, a budget-vs-actual breakdown, and three charts, built entirely with formulas so it recalculates as new expenses are logged.</p>
+        <div class="tags"><span class="tag">Excel</span><span class="tag">Formulas &amp; Charts</span><span class="tag">Data Analysis</span></div>
+        <a href="#expense-dashboard" class="card-link">See how it was built ↓</a>
       </div>
     </div>
   </div>
@@ -472,6 +490,44 @@
   </div>
 </section>
 
+<section class="alt" id="expense-dashboard">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Excel Project</div>
+      <h2>Personal Expense Dashboard</h2>
+    </div>
+    <p class="reveal" style="color:var(--muted); max-width:70ch; margin-top:-20px; margin-bottom:24px;">
+      A personal finance dashboard built in Excel — log an expense once, and the totals, budget comparison, and all three charts update on their own. Built to show real Excel proficiency: structured tables, cross-sheet formulas, conditional formatting, and charts — not just typed-in numbers.
+    </p>
+
+    <div class="reveal" style="background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin-bottom:28px;">
+      <img src="assets/expense-dashboard-preview.png" alt="Screenshot of the Personal Expense Dashboard in Excel, showing KPI cards, a spending-by-category pie chart, a budget vs actual bar chart, and a monthly trend line chart" style="width:100%; height:auto; border-radius:8px; display:block;">
+    </div>
+
+    <div class="dash-build-grid reveal">
+      <div>
+        <h3 class="dash-build-head">How it's built</h3>
+        <ul class="dash-build-list">
+          <li><strong>Three linked sheets</strong> — an Expense Log for data entry (with a dropdown-restricted Category column so entries stay consistent), a Budget sheet, and the Dashboard itself.</li>
+          <li><strong>Formula-driven, not hardcoded</strong> — every KPI and chart pulls from <code>SUMIFS</code>, <code>INDEX</code>/<code>MATCH</code>, and <code>SUMPRODUCT</code> formulas, so the whole dashboard recalculates the moment a new expense is logged.</li>
+          <li><strong>Conditional formatting</strong> — the % Used column turns red once a category goes over budget, with a green-to-red color scale for a quick visual scan.</li>
+          <li><strong>Three charts</strong> — a category breakdown (pie), budget vs. actual (bar), and a monthly trend (line), all reading live off the formula outputs.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="dash-build-head">What it tracks</h3>
+        <ul class="dash-build-list">
+          <li>Total spent, total budget, budget remaining, and average daily spend</li>
+          <li>Spending broken down across 10 categories — rent, food, transport, utilities, and more</li>
+          <li>Which category is over budget, and by how much</li>
+          <li>Month-over-month spending trend</li>
+        </ul>
+        <a href="Personal-Expense-Dashboard.xlsx" class="btn btn-primary" download style="margin-top:12px;">Download the Excel file</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="contact">
   <div class="wrap contact-grid">
     <div class="contact-info reveal">
@@ -538,7 +594,7 @@
   });
 
   /* Active nav on scroll */
-  var sectionIds = ["about","skills","experience","projects","workflow","contact"];
+  var sectionIds = ["about","skills","experience","projects","workflow","expense-dashboard","contact"];
   var navAnchors = document.querySelectorAll("[data-nav]");
   var navObserver = new IntersectionObserver(function(entries){
     entries.forEach(function(entry){
