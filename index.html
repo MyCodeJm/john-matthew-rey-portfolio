@@ -303,7 +303,7 @@
         <div class="eyebrow" style="margin-bottom:14px;">Education</div>
         <div class="deg">Bachelor of Science in Information Technology</div>
         <div class="school">Dalubhasaan ng Lungsod ng Lucena</div>
-        <div class="yr">Graduate <span class="placeholder">(add year)</span></div>
+        <div class="yr">Graduated July 2024</div>
       </div>
     </div>
   </div>
@@ -338,7 +338,7 @@
       <div class="tl-item">
         <div class="tl-head">
           <span class="tl-role">Counter Support Staff</span>
-          <span class="tl-dates">Feb 2026 — Present</span>
+          <span class="tl-dates">Feb 2025 – Present</span>
         </div>
         <div class="tl-org">Abenson Ventures Inc.</div>
         <ul>
@@ -351,9 +351,9 @@
       <div class="tl-item">
         <div class="tl-head">
           <span class="tl-role">Sales Call Center Agent</span>
-          <span class="tl-dates placeholder">(add dates)</span>
+          <span class="tl-dates">June 2022 – July 2023</span>
         </div>
-        <div class="tl-org">Derive</div>
+        <div class="tl-org">Derive Services</div>
         <ul>
           <li>Handled inbound and outbound calls for sales and customer inquiries</li>
           <li>Delivered clear, professional communication under time-sensitive conditions</li>
@@ -386,7 +386,7 @@
       </div>
       <div class="card">
         <h3>Personal Expense Dashboard</h3>
-        <p>A self-updating Excel dashboard for tracking personal spending — formula-driven KPIs, a budget-vs-actual breakdown, and three charts, built entirely with formulas so it recalculates as new expenses are logged.</p>
+        <p>A self-updating Excel dashboard tracking income and spending in pesos — formula-driven KPIs, a full profit &amp; loss breakdown, and four charts, built entirely with formulas so it recalculates as new rows are logged.</p>
         <div class="tags"><span class="tag">Excel</span><span class="tag">Formulas &amp; Charts</span><span class="tag">Data Analysis</span></div>
         <a href="#expense-dashboard" class="card-link">See how it was built ↓</a>
       </div>
@@ -497,7 +497,7 @@
       <h2>Personal Expense Dashboard</h2>
     </div>
     <p class="reveal" style="color:var(--muted); max-width:70ch; margin-top:-20px; margin-bottom:24px;">
-      A personal finance dashboard built in Excel — log an expense once, and the totals, budget comparison, and all three charts update on their own. Built to show real Excel proficiency: structured tables, cross-sheet formulas, conditional formatting, and charts — not just typed-in numbers.
+      A personal finance dashboard built in Excel — log an income or expense once, and every KPI, the profit &amp; loss table, and all four charts update on their own. Built to show real Excel proficiency: structured tables, cross-sheet formulas, conditional formatting, and charts — not just typed-in numbers. All figures in Philippine pesos.
     </p>
 
     <div class="reveal" style="background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin-bottom:28px;">
@@ -508,19 +508,20 @@
       <div>
         <h3 class="dash-build-head">How it's built</h3>
         <ul class="dash-build-list">
-          <li><strong>Three linked sheets</strong> — an Expense Log for data entry (with a dropdown-restricted Category column so entries stay consistent), a Budget sheet, and the Dashboard itself.</li>
-          <li><strong>Formula-driven, not hardcoded</strong> — every KPI and chart pulls from <code>SUMIFS</code>, <code>INDEX</code>/<code>MATCH</code>, and <code>SUMPRODUCT</code> formulas, so the whole dashboard recalculates the moment a new expense is logged.</li>
-          <li><strong>Conditional formatting</strong> — the % Used column turns red once a category goes over budget, with a green-to-red color scale for a quick visual scan.</li>
-          <li><strong>Three charts</strong> — a category breakdown (pie), budget vs. actual (bar), and a monthly trend (line), all reading live off the formula outputs.</li>
+          <li><strong>Four linked sheets</strong> — separate Income and Expense logs for data entry (both with dropdown-restricted columns so entries stay consistent), a Budget sheet for monthly targets, and the Dashboard itself.</li>
+          <li><strong>Formula-driven, not hardcoded</strong> — every KPI, table, and chart pulls from <code>SUMIFS</code>, <code>INDEX</code>/<code>MATCH</code>, and <code>SUMPRODUCT</code> formulas, so the whole dashboard recalculates the moment a new row is logged.</li>
+          <li><strong>Budgets scale to the period</strong> — the sheet counts how many months your data covers and scales the monthly targets to match, so a 3-month log is compared against 3 months of budget instead of one.</li>
+          <li><strong>Conditional formatting</strong> — the Variance column turns red when you're behind target and green when you're ahead, for a quick visual scan.</li>
+          <li><strong>Four charts</strong> — expenses by category, income vs. budget by month, expenses vs. budget by month, and an income-mix donut, all reading live off the formula outputs.</li>
         </ul>
       </div>
       <div>
         <h3 class="dash-build-head">What it tracks</h3>
         <ul class="dash-build-list">
-          <li>Total spent, total budget, budget remaining, and average daily spend</li>
-          <li>Spending broken down across 10 categories — rent, food, transport, utilities, and more</li>
-          <li>Which category is over budget, and by how much</li>
-          <li>Month-over-month spending trend</li>
+          <li>Income surplus, how far ahead or behind budget you are, and a running total per spending category</li>
+          <li>Spending across six categories — living expenses, dining out, transport, discretionary, medical, and charity</li>
+          <li>A full personal profit &amp; loss statement: actual vs. budget vs. variance, line by line</li>
+          <li>Where your income comes from, and month-over-month income and expense trends</li>
         </ul>
         <a href="Personal-Expense-Dashboard.xlsx" class="btn btn-primary" download style="margin-top:12px;">Download the Excel file</a>
       </div>
@@ -569,7 +570,7 @@
 
 <footer>
   <div class="wrap">
-    Sample fields marked in orange still need your details before this goes live.
+    © 2026 John Matthew Rey — built with plain HTML, CSS, and JavaScript.
     <a href="#top">Back to top ↑</a>
   </div>
 </footer>
